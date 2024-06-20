@@ -12,7 +12,8 @@ let baseURL;
 // }
 
 
-baseURL = "http://127.0.0.1:8000/";
+// baseURL = "http://127.0.0.1:8000/";
+baseURL = 'https://tech-hive-ware-backend.onrender.com/';
 const api = axios.create({
   baseURL: baseURL,
   headers: {
