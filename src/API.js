@@ -2,7 +2,7 @@ import axios from "axios";
 require('dotenv').config()
 
 export const LOGIN_USER_KEY = "HIVE_TECHWEAR_LOGIN_USER_KEY";
-const { REACT_APP_ENVIRONMENT, REACT_APP_API_BASE_URL_PROD, REACT_APP_API_BASE_URL_DEV } = process.env;
+// const { REACT_APP_ENVIRONMENT, REACT_APP_API_BASE_URL_DEV, REACT_APP_API_BASE_URL_PROD } = process.env;
 let baseURL;
 
 // if (REACT_APP_ENVIRONMENT === "PRODUCTION") {
@@ -11,7 +11,13 @@ let baseURL;
 // 	baseURL = REACT_APP_API_BASE_URL_DEV;
 // }
 
-baseURL = 'https://tech-hive-ware-backend.onrender.com/';
+if (process.env.REACT_APP_ENVIRONMENT && process.env.REACT_APP_ENVIRONMENT === "PRODUCTION") {
+	baseURL = process.env.REACT_APP_API_BASE_URL_PROD;
+} else {
+	baseURL = "http://127.0.0.1:8000";
+}
+
+// baseURL = 'https://tech-hive-ware-backend.onrender.com/';
 const api = axios.create({
   baseURL: baseURL,
   headers: {
@@ -38,14 +44,19 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    console.log("error.response", error);
-    if (error.response.status === 401) {
+    console.log("Error occurred:", error);
+
+    // Check if error.response exists before accessing status
+    if (error.response && error.response.status === 401) {
       localStorage.removeItem(LOGIN_USER_KEY);
+    } else if (!error.response) {
+      console.error("Network error or no response from server.");
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error); // Forward the error for further handling
   }
 );
+
 
 export default class API {
   signUp = async (signUpBody) => {
